@@ -140,13 +140,13 @@ class Game:
                         self.state = 'PHASE'
                 
                 elif self.state == 'PHASE':
-                    if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    if event.key == pygame.K_SPACE:
                         self.new_game()
                 
                 elif self.state == 'GAME':
                     if event.key == pygame.K_SPACE:
                         self.check_interaction()
-                    elif event.key == pygame.K_LALT or event.key == pygame.K_RALT:
+                    elif event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
                         self.weapon.shoot()
                 
                 elif self.state in ['GAME_OVER', 'VICTORY']:
@@ -205,12 +205,15 @@ class Game:
                  # Optionally play sound
             # Check for Exit
             elif self.map.world_map[(ix, iy)] == '9':
-                self.current_level += 1
-                # Ao invés de carregar imediatamente, vamos para a tela de Fase
-                # Mas precisamos verificar se a fase existe antes?
-                # A lógica atual do new_game tenta carregar, se falhar vai para Victory.
-                # Então podemos ir para PHASE e deixar o new_game lidar com o erro/sucesso depois.
-                self.state = 'PHASE'
+                next_level = self.current_level + 1
+                next_map_path = os.path.join(
+                    os.path.dirname(__file__), '..', 'assets', 'maps', f'{next_level}.txt'
+                )
+                if os.path.exists(next_map_path):
+                    self.current_level = next_level
+                    self.state = 'PHASE'
+                else:
+                    self.state = 'VICTORY'
 
     def run(self):
         """Loop principal do jogo."""
