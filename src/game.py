@@ -8,6 +8,7 @@ from .raycasting import RayCasting
 from .renderer import Renderer
 from .weapon import Weapon
 from .hud import HUD
+from .sprite_object import SpriteObject, Powerup
 
 class Game:
     """
@@ -39,6 +40,7 @@ class Game:
         self.raycasting = None
         self.weapon = None
         self.enemies = []
+        self.sprite_objects = []
 
     def load_images(self):
         """Carrega e escala as imagens de interface."""
@@ -84,6 +86,7 @@ class Game:
         self.snd_die = load('Die.mp3')
         self.snd_nextlevel = load('Nextlevel.mp3')
         self.snd_door = load('Door.mp3')
+        self.snd_powerup = load('Powerup.mp3')
 
     def play_splash_music(self):
         """Toca a música de Splash uma única vez."""
@@ -107,6 +110,7 @@ class Game:
     def new_game(self):
         """Inicializa ou reinicia o jogo/nível."""
         self.enemies = []
+        self.sprite_objects = []
         self.map = Map(self)
         try:
             self.map.load_map(self.current_level)
@@ -129,6 +133,8 @@ class Game:
             self.weapon.update()
             for enemy in self.enemies:
                 enemy.update()
+            for sprite in self.sprite_objects:
+                sprite.update()
         
         pygame.display.flip()
         self.delta_time = self.clock.tick(FPS)
@@ -232,6 +238,10 @@ class Game:
             print(f"Acertou Inimigo! Vida do Inimigo: {hit_enemy.health}")
             if hit_enemy.health <= 0:
                 print("Inimigo morto!")
+                # Drop ammo powerup
+                ammo_path = os.path.join('assets/images', '!.png')
+                self.sprite_objects.append(Powerup(self, ammo_path, (hit_enemy.x, hit_enemy.y), 'ammo', 10))
+                
                 self.enemies.remove(hit_enemy)
                 self.player.score += 100  # Score por kill
                 if self.snd_die:

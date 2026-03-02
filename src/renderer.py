@@ -29,7 +29,7 @@ class Renderer:
     def draw(self):
         self.draw_background()
         self.render_game_objects()
-        self.render_enemies()
+        self.render_sprites()
 
 
     def draw_background(self):
@@ -99,22 +99,31 @@ class Renderer:
                      # Draw a 4px high rect
                      pygame.draw.rect(self.screen, color, (ray * SCALE, y, SCALE, 4))
 
-    def render_enemies(self):
-        if not hasattr(self.game, 'enemies') or not self.game.enemies:
-            return
-            
+    def render_sprites(self):
         sprite_list = []
-        for enemy in self.game.enemies:
-            dx = enemy.x - self.game.player.x
-            dy = enemy.y - self.game.player.y
-            dist = math.hypot(dx, dy)
-            if dist > 0.2:
-                sprite_list.append((dist, dx, dy, enemy))
-                
+        # Add enemies
+        if hasattr(self.game, 'enemies'):
+            for enemy in self.game.enemies:
+                dx = enemy.x - self.game.player.x
+                dy = enemy.y - self.game.player.y
+                dist = math.hypot(dx, dy)
+                if dist > 0.2:
+                    # Enemy default scale 1.0, shift 0.0
+                    sprite_list.append((dist, dx, dy, enemy, 1.0, 0.0))
+        
+        # Add sprite objects
+        if hasattr(self.game, 'sprite_objects'):
+            for sprite in self.game.sprite_objects:
+                dx = sprite.x - self.game.player.x
+                dy = sprite.y - self.game.player.y
+                dist = math.hypot(dx, dy)
+                if dist > 0.2:
+                    sprite_list.append((dist, dx, dy, sprite, sprite.scale, sprite.shift))
+
         # Ordena do mais longe para o mais perto
         sprite_list.sort(key=lambda x: x[0], reverse=True)
         
-        for dist, dx, dy, enemy in sprite_list:
+        for dist, dx, dy, obj, scale, shift in sprite_list:
             theta = math.atan2(dy, dx)
             delta = theta - self.game.player.angle
             
@@ -125,23 +134,33 @@ class Renderer:
                 proj_dist = dist * math.cos(delta)
                 if proj_dist <= 0: continue
                 
-                proj_height = SCREEN_DIST / proj_dist
+                proj_height = (SCREEN_DIST / proj_dist) * scale
                 sprite_w = int(proj_height)
+                # Handle ratio if it was defined, but for now assuming square
+                # Actually for Powerups/Decorations, we might need ratio.
+                # Let's check image ratio.
+                if hasattr(obj, 'image'):
+                    image = obj.image
+                else: # Enemy
+                    image = obj.frames[obj.current_frame]
+                
+                ratio = image.get_width() / image.get_height()
+                sprite_w = int(proj_height * ratio)
                 sprite_h = int(proj_height)
                 
                 screen_x = HALF_WIDTH + math.tan(delta) * SCREEN_DIST
                 start_x = int(screen_x - sprite_w // 2)
-                start_y = int(HALF_HEIGHT - sprite_h // 2)
+                
+                height_shift = sprite_h * shift
+                start_y = int(HALF_HEIGHT - sprite_h // 2 + height_shift)
                 
                 if start_x + sprite_w < 0 or start_x > WIDTH:
                     continue
                     
-                frame = enemy.frames[enemy.current_frame]
-                if frame.get_width() > 0:
+                if image.get_width() > 0:
                     try:
-                        # Para performance, em pygame desenhar colunas de um frame com suporte Alpha e devagar.
-                        # Mas pra sprites de baixa resolucao / escala e viavel.
-                        frame = pygame.transform.scale(frame, (sprite_w, sprite_h))
+                        # Scale image
+                        frame = pygame.transform.scale(image, (sprite_w, sprite_h))
                         
                         # Z-buffer simplificado via colunas da textura original
                         for screen_col in range(start_x, start_x + sprite_w, SCALE):
@@ -154,5 +173,5 @@ class Renderer:
                                         if col_w > 0:
                                             col_surf = frame.subsurface((tex_x, 0, col_w, sprite_h))
                                             self.screen.blit(col_surf, (screen_col, start_y))
-                    except ValueError:
+                    except (ValueError, pygame.error):
                         pass

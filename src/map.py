@@ -1,5 +1,6 @@
 from .settings import *
 from .enemy import Enemy
+from .sprite_object import SpriteObject, Powerup
 
 
 class Map:
@@ -37,6 +38,10 @@ class Map:
                 elif value in ['a', 'b', 'c', 'd', 'e', 'f']: # Inimigos
                     if hasattr(self.game, 'enemies'):
                         self.game.enemies.append(Enemy(self.game, i, j, value))
+                elif value == '@': # Health
+                    self.game.sprite_objects.append(Powerup(self.game, 'assets/images/@.png', (i + 0.5, j + 0.5), 'health', 10))
+                elif value == '#': # Decoration
+                    self.game.sprite_objects.append(SpriteObject(self.game, 'assets/images/#.png', (i + 0.5, j + 0.5)))
 
     def draw(self):
         """Opcional: Desenha o mapa 2D para depuração."""
