@@ -17,6 +17,7 @@ class Game:
     """
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode(RES)
         self.clock = pygame.time.Clock()
         self.delta_time = 1
@@ -24,9 +25,12 @@ class Game:
         
         # Load Images
         self.load_images()
+        # Load Sounds
+        self.load_sounds()
         
         # Game State: SPLASH, PHASE, GAME, GAME_OVER, VICTORY
         self.state = 'SPLASH'
+        self.play_splash_music()
         
         # Game objects will be initialized in new_game but we need them for some logic
         self.map = None
@@ -62,6 +66,43 @@ class Game:
         # Font for text
         self.font = pygame.font.SysFont('Arial', 64, bold=True)
 
+    def load_sounds(self):
+        """Carrega todos os sons do jogo."""
+        snd_dir = os.path.join(os.path.dirname(__file__), '../assets/sounds')
+
+        def load(filename):
+            path = os.path.join(snd_dir, filename)
+            try:
+                return pygame.mixer.Sound(path)
+            except Exception as e:
+                print(f"[SOM] Erro ao carregar {filename}: {e}")
+                return None
+
+        self.snd_splash = load('Splash.mp3')
+        self.snd_background = load('Background.mp3')
+        self.snd_fire = load('Fire.wav')
+        self.snd_die = load('Die.mp3')
+        self.snd_nextlevel = load('Nextlevel.mp3')
+        self.snd_door = load('Door.mp3')
+
+    def play_splash_music(self):
+        """Toca a música de Splash uma única vez."""
+        pygame.mixer.stop()
+        if self.snd_splash:
+            self.snd_splash.play()
+
+    def play_phase_music(self):
+        """Toca o som de passagem de fase uma única vez."""
+        pygame.mixer.stop()
+        if self.snd_nextlevel:
+            self.snd_nextlevel.play()
+
+    def play_background_music(self):
+        """Toca a música de fundo em loop."""
+        pygame.mixer.stop()
+        if self.snd_background:
+            self.snd_background.play(loops=-1)
+
 
     def new_game(self):
         """Inicializa ou reinicia o jogo/nível."""
@@ -74,10 +115,11 @@ class Game:
             self.raycasting = RayCasting(self)
             self.weapon = Weapon(self)
             self.hud = HUD(self)
-            self.state = 'GAME' # Go to game after loading
+            self.state = 'GAME'
+            self.play_background_music()
         except Exception as e:
             print(f"Erro ao carregar mapa {self.current_level}: {e}")
-            self.state = 'VICTORY' # Assume victory if no more maps (or loop back)
+            self.state = 'VICTORY'
 
     def update(self):
         """Atualiza a lógica do jogo dependendo do estado."""
@@ -138,6 +180,7 @@ class Game:
                 if self.state == 'SPLASH':
                     if event.key == pygame.K_SPACE:
                         self.state = 'PHASE'
+                        self.play_phase_music()
                 
                 elif self.state == 'PHASE':
                     if event.key == pygame.K_SPACE:
@@ -148,13 +191,14 @@ class Game:
                         self.check_interaction()
                     elif event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
                         self.weapon.shoot()
+                        if self.snd_fire:
+                            self.snd_fire.play()
                 
                 elif self.state in ['GAME_OVER', 'VICTORY']:
                     if event.key == pygame.K_SPACE:
-                        # Reiniciar jogo do zero
                         self.current_level = 1
                         self.state = 'SPLASH'
-
+                        self.play_splash_music()
     def check_hit(self):
         """Lógica de acerto (Hitscan)."""
         center_ray_index = NUM_RAYS // 2
@@ -190,6 +234,8 @@ class Game:
                 print("Inimigo morto!")
                 self.enemies.remove(hit_enemy)
                 self.player.score += 100  # Score por kill
+                if self.snd_die:
+                    self.snd_die.play()
         else:
             print(f"Bang! Tiro disparado! Parede atingida a {depth_to_wall:.2f}")
 
@@ -202,7 +248,8 @@ class Game:
             if self.map.world_map[(ix, iy)] == '2':
                  # Open door (remove from map for now)
                  del self.map.world_map[(ix, iy)]
-                 # Optionally play sound
+                 if self.snd_door:
+                     self.snd_door.play()
             # Check for Exit
             elif self.map.world_map[(ix, iy)] == '9':
                 next_level = self.current_level + 1
@@ -212,7 +259,9 @@ class Game:
                 if os.path.exists(next_map_path):
                     self.current_level = next_level
                     self.state = 'PHASE'
+                    self.play_phase_music()
                 else:
+                    pygame.mixer.stop()
                     self.state = 'VICTORY'
 
     def run(self):
