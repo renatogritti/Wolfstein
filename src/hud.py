@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: hud.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Interface de usuário (HUD) para exibição de vida, munição, score e vidas.
+--------------------------------------------------------------------------------
+"""
+
+
 import os
 import pygame
 from .settings import *

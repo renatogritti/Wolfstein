@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: sprite_object.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Definição de objetos estáticos e interativos (powerups) no mundo 3D.
+--------------------------------------------------------------------------------
+"""
+
+
 import pygame
 import os
 import math

@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: player.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Representação do jogador, gerenciando movimento, colisão e interação.
+--------------------------------------------------------------------------------
+"""
+
+
 from .settings import *
 import pygame
 import math

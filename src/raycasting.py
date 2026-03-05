@@ -1,3 +1,15 @@
+"""
+
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: raycasting.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Implementação do algoritmo de Raycasting para projeção pseudo-3D.
+--------------------------------------------------------------------------------
+"""
+
+
 import pygame
 import math
 from .settings import *

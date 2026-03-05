@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: settings.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Configurações globais e derivações matemáticas para o motor de jogo.
+--------------------------------------------------------------------------------
+"""
+
+
 import math
 from .config import *
 

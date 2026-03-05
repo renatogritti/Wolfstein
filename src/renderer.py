@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: renderer.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Sistema de renderização gráfico, gerenciando paredes, sprites e efeitos visuais.
+--------------------------------------------------------------------------------
+"""
+
+
 import pygame
 import math
 from .settings import *
@@ -36,7 +47,7 @@ class Renderer:
 
     def draw_crosshair(self):
         """Desenha uma mira (+) no centro da tela."""
-        color = (0, 255, 0)
+        color = (200, 200, 200) # Cinza claro
         length = 20
         # Horizontal line
         pygame.draw.line(self.screen, color, (HALF_WIDTH - length, HALF_HEIGHT), (HALF_WIDTH + length, HALF_HEIGHT), 2)

@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: weapon.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Gerenciamento de animações e lógica de disparo da arma do jogador.
+--------------------------------------------------------------------------------
+"""
+
+
 import os
 import pygame
 from PIL import Image

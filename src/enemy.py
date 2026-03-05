@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: enemy.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Lógica de inteligência artificial, movimentação e combate dos inimigos.
+--------------------------------------------------------------------------------
+"""
+
+
 import pygame
 import math
 import os
@@ -56,6 +67,30 @@ class Enemy:
             self.animation_timer = 0
             self.current_frame = (self.current_frame + 1) % len(self.frames)
 
+    def check_los(self):
+        """Verifica se há linha de visão direta entre o inimigo e o jogador."""
+        px, py = self.game.player.pos
+        ex, ey = self.x, self.y
+        
+        dx = px - ex
+        dy = py - ey
+        distance = math.hypot(dx, dy)
+        
+        if distance == 0:
+            return True
+            
+        dx /= distance
+        dy /= distance
+        
+        # Percorre o caminho em pequenos passos para verificar colisão com paredes
+        step = 0.2
+        for i in range(1, int(distance / step)):
+            check_x = ex + dx * (i * step)
+            check_y = ey + dy * (i * step)
+            if (int(check_x), int(check_y)) in self.game.map.world_map:
+                return False
+        return True
+
     def ai_logic(self):
         # Lógica de seguir o jogador
         px, py = self.game.player.pos
@@ -63,13 +98,16 @@ class Enemy:
         dy = py - self.y
         distance = math.hypot(dx, dy)
         
+        # Só age se tiver linha de visão
+        has_los = self.check_los()
+        
         # Aumentamos o range de ataque para uma distância mais realista.
         # Se ver o jogador (distância < 10) começa a seguir. 
         # Mas para atirar / atacar (distância <= 3.0), ele para de seguir e ataca.
         attack_range = 3.0
         collision_radius = 0.6
         
-        if distance < 10 and distance > attack_range:
+        if has_los and distance < 10 and distance > attack_range:
             self.state = 'walking'
             dx = dx / distance
             dy = dy / distance
@@ -83,7 +121,7 @@ class Enemy:
                 self.x = check_x
             if (int(self.x), int(check_y + (collision_radius if dy > 0 else -collision_radius))) not in self.game.map.world_map:
                 self.y = check_y
-        elif distance <= attack_range:
+        elif has_los and distance <= attack_range:
             self.state = 'attacking'
             # Lógica de combate - dano no Player
             self.attack_timer += 1

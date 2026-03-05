@@ -1,7 +1,13 @@
 """
-config.py — Configurações ajustáveis do jogador e da HUD.
-Modifique este arquivo para alterar valores sem tocar no código do jogo.
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: config.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Configurações ajustáveis do jogador e da interface (HUD).
+--------------------------------------------------------------------------------
 """
+
 
 # ─────────────────────────────────────────────
 #  Player defaults

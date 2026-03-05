@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: game.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Gerenciador principal do jogo, controla o loop, estados e carregamento de recursos.
+--------------------------------------------------------------------------------
+"""
+
+
 import pygame
 import sys
 import os

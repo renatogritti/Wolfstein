@@ -1,3 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+Projeto: Wolfstein
+Arquivo: map.py
+Autor: Renato Gritti
+Data: 2026-03-05
+Descrição: Gerenciamento de mapas, carregamento de arquivos e posicionamento de objetos.
+--------------------------------------------------------------------------------
+"""
+
+
 from .settings import *
 from .enemy import Enemy
 from .sprite_object import SpriteObject, Powerup
