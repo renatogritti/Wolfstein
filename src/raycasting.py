@@ -53,7 +53,7 @@ class RayCasting:
             delta_depth = dy / sin_a
             dx = delta_depth * cos_a
 
-            texture_hor = 1 # Default texture if no wall hit
+            texture_hor = '1' # Default texture if no wall hit
             for i in range(MAX_DEPTH):
                 tile_hor = int(x_hor), int(y_hor)
                 if tile_hor in self.game.map.world_map:
@@ -73,7 +73,7 @@ class RayCasting:
             delta_depth = dx / cos_a
             dy = delta_depth * sin_a
 
-            texture_vert = 1 # Default texture
+            texture_vert = '1' # Default texture
             for i in range(MAX_DEPTH):
                 tile_vert = int(x_vert), int(y_vert)
                 if tile_vert in self.game.map.world_map:

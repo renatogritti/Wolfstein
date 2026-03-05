@@ -41,6 +41,10 @@ class Game:
         self.weapon = None
         self.enemies = []
         self.sprite_objects = []
+        
+        # Timers for visual effects
+        self.shot_timer = 0
+        self.damage_timer = 0
 
     def load_images(self):
         """Carrega e escala as imagens de interface."""
@@ -87,6 +91,8 @@ class Game:
         self.snd_nextlevel = load('Nextlevel.mp3')
         self.snd_door = load('Door.mp3')
         self.snd_powerup = load('Powerup.mp3')
+        if self.snd_powerup:
+            self.snd_powerup.set_volume(0.2)
 
     def play_splash_music(self):
         """Toca a música de Splash uma única vez."""
@@ -135,6 +141,12 @@ class Game:
                 enemy.update()
             for sprite in self.sprite_objects:
                 sprite.update()
+            
+            # Update visual effects timers
+            if self.shot_timer > 0:
+                self.shot_timer -= self.delta_time
+            if self.damage_timer > 0:
+                self.damage_timer -= self.delta_time
         
         pygame.display.flip()
         self.delta_time = self.clock.tick(FPS)
@@ -249,6 +261,9 @@ class Game:
         else:
             print(f"Bang! Tiro disparado! Parede atingida a {depth_to_wall:.2f}")
 
+        # Trigger visual shooting effect
+        self.shot_timer = 50 # millisecond duration
+
     def check_interaction(self):
 
         """Verifica se o jogador pode interagir com o objeto à frente."""
@@ -273,6 +288,10 @@ class Game:
                 else:
                     pygame.mixer.stop()
                     self.state = 'VICTORY'
+
+    def trigger_damage(self):
+        """Ativa o efeito visual de dano."""
+        self.damage_timer = 100 # duration in ms
 
     def run(self):
         """Loop principal do jogo."""

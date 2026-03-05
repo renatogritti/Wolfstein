@@ -67,20 +67,21 @@ class Enemy:
         # Se ver o jogador (distância < 10) começa a seguir. 
         # Mas para atirar / atacar (distância <= 3.0), ele para de seguir e ataca.
         attack_range = 3.0
+        collision_radius = 0.6
         
         if distance < 10 and distance > attack_range:
             self.state = 'walking'
             dx = dx / distance
             dy = dy / distance
             
-            # Movimento sem colisão avançada por enquanto, simplificado
+            # Movimento com raio de colisão para evitar atravessar paredes
             check_x = self.x + dx * self.speed
             check_y = self.y + dy * self.speed
             
-            # Simple collision check with walls
-            if (int(check_x), int(self.y)) not in self.game.map.world_map:
+            # Wall collision check with radius
+            if (int(check_x + (collision_radius if dx > 0 else -collision_radius)), int(self.y)) not in self.game.map.world_map:
                 self.x = check_x
-            if (int(self.x), int(check_y)) not in self.game.map.world_map:
+            if (int(self.x), int(check_y + (collision_radius if dy > 0 else -collision_radius))) not in self.game.map.world_map:
                 self.y = check_y
         elif distance <= attack_range:
             self.state = 'attacking'
@@ -89,6 +90,7 @@ class Enemy:
             if self.attack_timer >= self.attack_speed:
                 self.attack_timer = 0
                 self.game.player.health -= self.damage
+                self.game.trigger_damage()
                 print(f"Ai! Inimigo me atacou! Vida: {self.game.player.health}")
         else:
             self.state = 'idle'

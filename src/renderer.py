@@ -30,6 +30,34 @@ class Renderer:
         self.draw_background()
         self.render_game_objects()
         self.render_sprites()
+        self.draw_crosshair()
+        self.draw_shot_effect()
+        self.draw_damage_effect()
+
+    def draw_crosshair(self):
+        """Desenha uma mira (+) no centro da tela."""
+        color = (0, 255, 0)
+        length = 20
+        # Horizontal line
+        pygame.draw.line(self.screen, color, (HALF_WIDTH - length, HALF_HEIGHT), (HALF_WIDTH + length, HALF_HEIGHT), 2)
+        # Vertical line
+        pygame.draw.line(self.screen, color, (HALF_WIDTH, HALF_HEIGHT - length), (HALF_WIDTH, HALF_HEIGHT + length), 2)
+
+    def draw_shot_effect(self):
+        """Desenha um lampejo sutil quando o jogador atira."""
+        if self.game.shot_timer > 0:
+            # Subtle yellow flash in the center
+            s = pygame.Surface((100, 100), pygame.SRCALPHA)
+            pygame.draw.circle(s, (255, 255, 0, 100), (50, 50), 40)
+            self.screen.blit(s, (HALF_WIDTH - 50, HALF_HEIGHT - 50))
+
+    def draw_damage_effect(self):
+        """Desenha um piscar vermelho na tela quando o jogador é atingido."""
+        if self.game.damage_timer > 0:
+            s = pygame.Surface(RES)
+            s.set_alpha(100) # Semi-transparent
+            s.fill((255, 0, 0))
+            self.screen.blit(s, (0, 0))
 
 
     def draw_background(self):
